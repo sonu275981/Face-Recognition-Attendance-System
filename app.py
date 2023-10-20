@@ -1,137 +1,182 @@
+import sqlite3
 import cv2
-import numpy as np
-import face_recognition
 import os
+from flask import Flask,request,render_template,redirect,session,url_for
+from datetime import date
 from datetime import datetime
-from flask import Flask, flash, request, redirect, url_for, render_template, Response
-from werkzeug.utils import secure_filename
+import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
+import pandas as pd
+import joblib
+import db
 
-UPLOAD_FOLDER = r'C:\Users\sonuc\Desktop\Data_Science\face dectection\IMAGE_FILES'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
+#### Defining Flask App
 app = Flask(__name__)
-app.secret_key = "secret key"
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+#### Saving Date today in 2 different formats
+datetoday = date.today().strftime("%m_%d_%y")
+datetoday2 = date.today().strftime("%d-%B-%Y")
 
-@app.route('/')
-def upload_file():
-    return render_template('upload.html')
-
-
-@app.route('/success', methods=['GET', 'POST'])
-def success():
-    if 'file' not in request.files:
-        # flash('No file part')
-        return render_template('upload.html')
-    file = request.files['file']
-    if file.filename == '':
-        # flash('No image selected for uploading')
-        return render_template('upload.html')
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        # print('upload_image filename: ' + filename)
-        # flash('Image successfully uploaded and displayed below')
-        return render_template('upload.html')
-    else:
-        # flash('Allowed image types are -> png, jpg, jpeg, gif')
-        return render_template('upload.html')
-
-
-@app.route('/index')
-def index():
-    """Video streaming home page."""
-    return render_template('index.html')
-
-
-def gen():
-    IMAGE_FILES = []
-    filename = []
-    dir_path = r'C:\Users\sonuc\Desktop\Data_Science\face dectection\IMAGE_FILES'
-
-    for imagess in os.listdir(dir_path):
-        img_path = os.path.join(dir_path, imagess)
-        img_path = face_recognition.load_image_file(img_path)  # reading image and append to list
-        IMAGE_FILES.append(img_path)
-        filename.append(imagess.split(".", 1)[0])
-
-    def encoding_img(IMAGE_FILES):
-        encodeList = []
-        for img in IMAGE_FILES:
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            encode = face_recognition.face_encodings(img)[0]
-            encodeList.append(encode)
-        return encodeList
-
-    def takeAttendence(name):
-        with open('attendence.csv', 'r+') as f:
-            mypeople_list = f.readlines()
-            nameList = []
-            for line in mypeople_list:
-                entry = line.split(',')
-                nameList.append(entry[0])
-            if name not in nameList:
-                now = datetime.now()
-                datestring = now.strftime('%H:%M:%S')
-                f.writelines(f'\n{name},{datestring}')
-
-    encodeListknown = encoding_img(IMAGE_FILES)
-    # print(len('sucesses'))
-
+#### Initializing VideoCapture object to access WebCam
+face_detector = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+try:
+    cap = cv2.VideoCapture(1)
+except:
     cap = cv2.VideoCapture(0)
 
+#### If these directories don't exist, create them
+if not os.path.isdir('Attendance'):
+    os.makedirs('Attendance')
+if not os.path.isdir('static'):
+    os.makedirs('static')
+if not os.path.isdir('static/faces'):
+    os.makedirs('static/faces')
+if f'Attendance-{datetoday}.csv' not in os.listdir('Attendance'):
+    with open(f'Attendance/Attendance-{datetoday}.csv','w') as f:
+        f.write('Name,Roll,Time')
+
+#### get a number of total registered users
+def totalreg():
+    return len(os.listdir('static/faces'))
+
+#### extract the face from an image
+def extract_faces(img):
+    if img!=[]:
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        face_points = face_detector.detectMultiScale(gray, 1.3, 5)
+        return face_points
+    else:
+        return []
+
+#### Identify face using ML model
+def identify_face(facearray):
+    model = joblib.load('static/face_recognition_model.pkl')
+    return model.predict(facearray)
+
+#### A function which trains the model on all the faces available in faces folder
+def train_model():
+    faces = []
+    labels = []
+    userlist = os.listdir('static/faces')
+    for user in userlist:
+        for imgname in os.listdir(f'static/faces/{user}'):
+            img = cv2.imread(f'static/faces/{user}/{imgname}')
+            resized_face = cv2.resize(img, (50, 50))
+            faces.append(resized_face.ravel())
+            labels.append(user)
+    faces = np.array(faces)
+    knn = KNeighborsClassifier(n_neighbors=5)
+    knn.fit(faces,labels)
+    joblib.dump(knn,'static/face_recognition_model.pkl')
+
+#### Extract info from today's attendance file in attendance folder
+def extract_attendance():
+    df = pd.read_csv(f'Attendance/Attendance-{datetoday}.csv')
+    names = df['Name']
+    rolls = df['Roll']
+    times = df['Time']
+    l = len(df)
+    return names,rolls,times,l
+
+#### Add Attendance of a specific user
+def add_attendance(name):
+    username = name.split('_')[0]
+    userid = name.split('_')[1]
+    current_time = datetime.now().strftime("%H:%M:%S")
+    
+    df = pd.read_csv(f'Attendance/Attendance-{datetoday}.csv')
+    if str(userid) not in list(df['Roll']):
+        with open(f'Attendance/Attendance-{datetoday}.csv','a') as f:
+            f.write(f'\n{username},{userid},{current_time}')
+
+
+################## ROUTING FUNCTIONS ##############################
+
+#### Our main page
+@app.route('/')
+def home():
+    names,rolls,times,l = extract_attendance()    
+    return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg,datetoday2=datetoday2) 
+
+
+#### This function will run when we click on Take Attendance Button
+@app.route('/start',methods=['GET'])
+def start():
+    if 'face_recognition_model.pkl' not in os.listdir('static'):
+        return render_template('home.html',totalreg=totalreg(),datetoday2=datetoday2,mess='There is no trained model in the static folder. Please add a new face to continue.') 
+
+    cap = cv2.VideoCapture(0)
+    ret = True
     while True:
-        success, img = cap.read()
-        imgc = cv2.resize(img, (0, 0), None, 0.25, 0.25)
-        # converting image to RGB from BGR
-        imgc = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        # Read a frame from the camera
+        ret, frame = cap.read()
+        
+        # Convert the frame to grayscale
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        
+        # Detect faces in the grayscale frame
+        faces = face_detector.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+        
+        # Draw rectangles around the detected faces
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+            face = cv2.resize(frame[y:y+h,x:x+w], (50, 50))
+            identified_person = identify_face(face.reshape(1,-1))[0]
+            add_attendance(identified_person)
+            cv2.putText(frame,f'{identified_person}',(x + 6, y - 6),cv2.FONT_HERSHEY_SIMPLEX,1,(255, 0, 20),2)
+            # img, name, , , 1, (255, 255, 255), 2
 
-        fasescurrent = face_recognition.face_locations(imgc)
-        encode_fasescurrent = face_recognition.face_encodings(imgc, fasescurrent)
-
-        # faceloc- one by one it grab one face location from fasescurrent
-        # than encodeFace grab encoding from encode_fasescurrent
-        # we want them all in same loop so we are using zip
-        for encodeFace, faceloc in zip(encode_fasescurrent, fasescurrent):
-            matches_face = face_recognition.compare_faces(encodeListknown, encodeFace)
-            face_distence = face_recognition.face_distance(encodeListknown, encodeFace)
-            # print(face_distence)
-            # finding minimum distence index that will return best match
-            matchindex = np.argmin(face_distence)
-
-            if matches_face[matchindex]:
-                name = filename[matchindex].upper()
-                # print(name)
-                y1, x2, y2, x1 = faceloc
-                # multiply locations by 4 because we above we reduced our webcam input image by 0.25
-                # y1,x2,y2,x1 = y1*4,x2*4,y2*4,x1*4
-                cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 2)
-                cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (255, 0, 0), 2, cv2.FILLED)
-                cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-                takeAttendence(name)  # taking name for attendence function above
-
-        # cv2.imshow("campare", img)
-        # cv2.waitKey(0)
-        frame = cv2.imencode('.jpg', img)[1].tobytes()
-        yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        key = cv2.waitKey(20)
-        if key == 27:
+        # Display the resulting frame
+        cv2.imshow('Attendance Check', frame)
+        cv2.putText(frame,'hello',(30,30),cv2.FONT_HERSHEY_COMPLEX,2,(255, 255, 255))
+        
+    # Wait for the user to press 'q' to quit
+        if cv2.waitKey(1)==27 & 0xFF == ord('q'):
             break
 
-
-@app.route('/video_feed')
-def video_feed():
-    """Video streaming route. Put this in the src attribute of an img tag."""
-    return Response(gen(),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    cap.release()
+    cv2.destroyAllWindows()
+    names,rolls,times,l = extract_attendance()    
+    return render_template('navbar_logout.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2) 
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+#### This function will run when we add a new user
+@app.route('/add',methods=['GET','POST'])
+def add():
+    newusername = request.form['newusername']
+    newuserid = request.form['newuserid']
+    userimagefolder = 'static/faces/'+newusername+'_'+str(newuserid)
+    if not os.path.isdir(userimagefolder):
+        os.makedirs(userimagefolder)
+    cap = cv2.VideoCapture(0)
+    i,j = 0,0
+    while 1:
+        _,frame = cap.read()
+        faces = extract_faces(frame)
+        for (x,y,w,h) in faces:
+            cv2.rectangle(frame,(x, y), (x+w, y+h), (255, 0, 20), 2)
+            cv2.putText(frame,f'Images Captured: {i}/50',(30,30),cv2.FONT_HERSHEY_SIMPLEX,1,(255, 0, 20),2,cv2.LINE_AA)
+            if j%10==0:
+                name = newusername+'_'+str(i)+'.jpg'
+                cv2.imwrite(userimagefolder+'/'+name,frame[y:y+h,x:x+w])
+                i+=1
+            j+=1
+        if j==500:
+            break
+        cv2.imshow('Adding new User',frame)
+        if cv2.waitKey(1)==27:
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+    print('Training Model')
+    train_model()
+    names,rolls,times,l = extract_attendance()   
+    if totalreg > 0 :
+        return redirect(url_for('index'))
+    else:
+        return redirect(url_for('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2))
+    # return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2) 
+
+#### Our main function which runs the Flask App
+if __name__ == '__main__':
+    app.run(debug=True,port=1000)
