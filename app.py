@@ -10,6 +10,9 @@ import pandas as pd
 import joblib
 # import db
 
+#VARIABLES
+MESSAGE = "WELCOME"
+
 #### Defining Flask App
 app = Flask(__name__)
 
@@ -95,8 +98,8 @@ def add_attendance(name):
 #### Our main page
 @app.route('/')
 def home():
-    names,rolls,times,l = extract_attendance()    
-    return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg,datetoday2=datetoday2) 
+    names,rolls,times,l = extract_attendance()
+    return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg,datetoday2=datetoday2, mess = MESSAGE)
 
 
 #### This function will run when we click on Take Attendance Button
@@ -140,7 +143,6 @@ def start():
     return render_template('navbar_logout.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2) 
 
 
-#### This function will run when we add a new user
 @app.route('/add',methods=['GET','POST'])
 def add():
     newusername = request.form['newusername']
@@ -172,11 +174,16 @@ def add():
     train_model()
     names,rolls,times,l = extract_attendance()
     if totalreg() > 0 :
-        return redirect(url_for('index'))
+        names, rolls, times, l = extract_attendance()
+        MESSAGE = 'User added Sucessfully'
+        print("message changed")
+        return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg,datetoday2=datetoday2, mess = MESSAGE)
     else:
         return redirect(url_for('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2))
-    # return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2) 
+    # return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2)
 
 #### Our main function which runs the Flask App
+app.run(debug=True,port=1000)
 if __name__ == '__main__':
-    app.run(debug=True,port=1000)
+    pass
+#### This function will run when we add a new user
