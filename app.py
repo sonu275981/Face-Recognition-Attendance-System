@@ -8,7 +8,7 @@ import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 import pandas as pd
 import joblib
-import db
+# import db
 
 #### Defining Flask App
 app = Flask(__name__)
@@ -170,8 +170,8 @@ def add():
     cv2.destroyAllWindows()
     print('Training Model')
     train_model()
-    names,rolls,times,l = extract_attendance()   
-    if totalreg > 0 :
+    names,rolls,times,l = extract_attendance()
+    if totalreg() > 0 :
         return redirect(url_for('index'))
     else:
         return redirect(url_for('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2))
