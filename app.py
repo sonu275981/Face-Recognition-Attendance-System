@@ -8,10 +8,12 @@ import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 import pandas as pd
 import joblib
+import time
 # import db
 
 #VARIABLES
-MESSAGE = "WELCOME"
+MESSAGE = "WELCOME  " \
+          " Instruction: to register your attendence kindly click on 'a' on keyboard"
 
 #### Defining Flask App
 app = Flask(__name__)
@@ -39,6 +41,7 @@ if f'Attendance-{datetoday}.csv' not in os.listdir('Attendance'):
         f.write('Name,Roll,Time')
 
 #### get a number of total registered users
+
 def totalreg():
     return len(os.listdir('static/faces'))
 
@@ -91,6 +94,10 @@ def add_attendance(name):
     if str(userid) not in list(df['Roll']):
         with open(f'Attendance/Attendance-{datetoday}.csv','a') as f:
             f.write(f'\n{username},{userid},{current_time}')
+    else:
+        print("this user has already marked attendence for the day , but still i am marking it ")
+        # with open(f'Attendance/Attendance-{datetoday}.csv','a') as f:
+        #     f.write(f'\n{username},{userid},{current_time}')
 
 
 ################## ROUTING FUNCTIONS ##############################
@@ -99,14 +106,19 @@ def add_attendance(name):
 @app.route('/')
 def home():
     names,rolls,times,l = extract_attendance()
-    return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg,datetoday2=datetoday2, mess = MESSAGE)
+    return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2, mess = MESSAGE)
 
 
 #### This function will run when we click on Take Attendance Button
 @app.route('/start',methods=['GET'])
 def start():
+    ATTENDENCE_MARKED = False
     if 'face_recognition_model.pkl' not in os.listdir('static'):
-        return render_template('home.html',totalreg=totalreg(),datetoday2=datetoday2,mess='There is no trained model in the static folder. Please add a new face to continue.') 
+        names, rolls, times, l = extract_attendance()
+        MESSAGE = 'This face is not registered with us , kindly register yourself first'
+        print("face not in database, need to register")
+        return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg,datetoday2=datetoday2, mess = MESSAGE)
+        # return render_template('home.html',totalreg=totalreg(),datetoday2=datetoday2,mess='There is no trained model in the static folder. Please add a new face to continue.')
 
     cap = cv2.VideoCapture(0)
     ret = True
@@ -125,23 +137,32 @@ def start():
             cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
             face = cv2.resize(frame[y:y+h,x:x+w], (50, 50))
             identified_person = identify_face(face.reshape(1,-1))[0]
-            add_attendance(identified_person)
-            cv2.putText(frame,f'{identified_person}',(x + 6, y - 6),cv2.FONT_HERSHEY_SIMPLEX,1,(255, 0, 20),2)
-            # img, name, , , 1, (255, 255, 255), 2
+            cv2.putText(frame, f'{identified_person}', (x + 6, y - 6), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 20), 2)
+            if cv2.waitKey(1) == ord('a'):
+                add_attendance(identified_person)
+                current_time_ = datetime.now().strftime("%H:%M:%S")
+                print(f"attendence marked for {identified_person}, at {current_time_} ")
+                ATTENDENCE_MARKED = True
+                break
+        if ATTENDENCE_MARKED:
+            # time.sleep(3)
+            break
 
         # Display the resulting frame
-        cv2.imshow('Attendance Check', frame)
+        cv2.imshow('Attendance Check, press "q" to exit', frame)
         cv2.putText(frame,'hello',(30,30),cv2.FONT_HERSHEY_COMPLEX,2,(255, 255, 255))
         
     # Wait for the user to press 'q' to quit
-        if cv2.waitKey(1)==27 & 0xFF == ord('q'):
+        if cv2.waitKey(1) == ord('q'):
             break
 
     cap.release()
     cv2.destroyAllWindows()
-    names,rolls,times,l = extract_attendance()    
-    return render_template('navbar_logout.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2) 
-
+    names, rolls, times, l = extract_attendance()
+    MESSAGE = 'Attendence taken successfully'
+    print("attendence registered")
+    return render_template('index.html', names=names, rolls=rolls, times=times, l=l, totalreg=totalreg(),
+                           datetoday2=datetoday2, mess=MESSAGE)
 
 @app.route('/add',methods=['GET','POST'])
 def add():
