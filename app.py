@@ -96,8 +96,8 @@ def add_attendance(name):
             f.write(f'\n{username},{userid},{current_time}')
     else:
         print("this user has already marked attendence for the day , but still i am marking it ")
-        with open(f'Attendance/Attendance-{datetoday}.csv','a') as f:
-            f.write(f'\n{username},{userid},{current_time}')
+        # with open(f'Attendance/Attendance-{datetoday}.csv','a') as f:
+        #     f.write(f'\n{username},{userid},{current_time}')
 
 
 ################## ROUTING FUNCTIONS ##############################
