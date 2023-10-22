@@ -39,6 +39,7 @@ if f'Attendance-{datetoday}.csv' not in os.listdir('Attendance'):
         f.write('Name,Roll,Time')
 
 #### get a number of total registered users
+
 def totalreg():
     return len(os.listdir('static/faces'))
 
@@ -99,7 +100,7 @@ def add_attendance(name):
 @app.route('/')
 def home():
     names,rolls,times,l = extract_attendance()
-    return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg,datetoday2=datetoday2, mess = MESSAGE)
+    return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2, mess = MESSAGE)
 
 
 #### This function will run when we click on Take Attendance Button
