@@ -1,4 +1,15 @@
-body{
+        @import url('https://fonts.googleapis.com/css2?family=Spartan:wght@100;200;300;400;500;600;700;800;900&display=swap');
+*,
+*::after,
+*::before{
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+
+
+.navbar-body{
 /* font-family: 'Urbanist', sans-serif; */
 overflow-x: hidden;
 background-image: url("https://img.freepik.com/free-vector/abstract-background-with-squares_23-2148995948.jpg?w=1380&t=st=1679987480~exp=1679988080~hmac=2e2bb46ff61d63ce5c2e81002abd079037a3c00743287bbb1fdfa8c95f3f0de7");
