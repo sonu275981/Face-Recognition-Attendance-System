@@ -1,4 +1,5 @@
-#Face Recognition Attendance System 
+
+# Face Recognition Attendance System 
 
 ## Description
 Software for Industry , where they can track the attendence of their employee with the help of face recognition using OpenCV library.
