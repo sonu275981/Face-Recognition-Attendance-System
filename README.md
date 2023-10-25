@@ -13,6 +13,7 @@ Software for Industry , where they can track the attendence of their employee wi
 - [License](#license)
 
 ## Project Plan
+link for workflow - https://excalidraw.com/#room=defb7c3bcad2795cad57,qyS3Sh-jkSRin4kbNKvmfw
 - Task:
   - [x] Create a home page
   - [x] Show attendence log on home for particular day
