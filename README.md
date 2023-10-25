@@ -16,6 +16,7 @@ Software for Industry , where they can track the attendence of their employee wi
 - Task:
   - [x] Create a home page
   - [x] Show attendence log on home for particular day
+  - [ ] Recreate a HTML , bootstrap boilerplate and remove unwanted code
   - [ ] Show date and day on home page
   - [ ] Company name should be visible on home page
   - [ ] Show list of total Employee on home page
