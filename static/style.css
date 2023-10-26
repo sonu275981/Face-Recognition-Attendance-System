@@ -1,0 +1,48 @@
+.navbar-text {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    color: black;
+}
+
+/* Custom styles for the navbar */
+.custom-navbar {
+    background-color: rgba(194, 217, 255, 0.6); /* Semi-transparent white background */
+    border-radius: 30px; /* Capsule shape */
+    margin-top: 10px; /* Margin from the top */
+    margin-left: 20px; /* Margin from the left */
+    margin-right: 20px; /* Margin from the right */
+}
+
+.custom-navbar .navbar-brand {
+    color: black; /* Text color for the company name */
+    font-size: 26px; /* Increase font size */
+    margin-left: 20px; /* Margin from the left to the logo */
+}
+
+.custom-navbar .navbar-brand:hover {
+    text-decoration: none; /* Remove the underline on hover */
+}
+
+.custom-navbar .nav-link {
+    color: black; /* Text color for other links */
+    transition: box-shadow 0.3s; /* Smooth transition for the shadow */
+    font-size: 18px; /* Increase font size */
+}
+
+.custom-navbar .nav-link:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Add a shadow on hover */
+}
+
+.custom-navbar .navbar-text {
+    font-size: 18px; /* Increase font size */
+}
+
+.custom-navbar .btn {
+    background-color: #6c3483; /* Dark purple background for the button */
+    color: white; /* Button text color */
+    border: none;
+}
+
+.custom-navbar .btn:hover {
+    background-color: #5b2a6e; /* Dark purple background on hover */
+}
