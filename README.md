@@ -52,7 +52,7 @@ link for workflow - https://excalidraw.com/#room=defb7c3bcad2795cad57,qyS3Sh-jkS
 - Explain how to install or set up the project.
 
 ## Usage
-- Provide usage instructions, examples, and screenshots.
+- this is useful in tracking the attendence of your employees
 
 ## Contributing
 - Explain how others can contribute to the project.
