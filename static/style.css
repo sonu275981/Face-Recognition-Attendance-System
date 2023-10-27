@@ -46,3 +46,10 @@
 .custom-navbar .btn:hover {
     background-color: #5b2a6e; /* Dark purple background on hover */
 }
+
+/* Additional CSS to clear floats */
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
