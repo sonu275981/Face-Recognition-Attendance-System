@@ -13,59 +13,47 @@
     <link href="../static/style.css", rel="stylesheet">
 </head>
 <body>
-<!--bootstrap header-->
-<div class="container">
-    <nav class="navbar navbar-expand-lg navbar-light custom-navbar fixed-top mb-4">
-        <a class="navbar-brand" href="#">
-            <img src="../static/images/companylogo.jpg" width="30" height="30" class="d-inline-block align-top" alt="Company Logo">
-            Company Name
-        </a>
-        <span class="navbar-text mx-auto">
-            Face Recognised attendence system
-        </span>
-        <div class="d-flex", style="margin-right:20px ">
-            <span class="navbar-text mr-2" style="margin-right:5px">
-                Date: 26/10/2023, Wednesday
-            </span>
-            <span class="navbar-text">
-            Time: 09:09 AM
-            </span>
-
-        </div>
-        <button class="btn my-2 my-sm-0" style="margin-right:20px">Admin Login</button>
-
-    </nav>
-</div>
-
-<main class="container" style="margin-top:100px">
-    <div class="container">
+    <div class="container-fluid">
+<!--below row is for navbar-->
         <div class="row">
-            <!-- First Box: 1st Column, Spanning 2 Rows -->
-            <div class="col-md-6">
-                <div class="box box-1">
-                    <h2>Box 1</h2>
-                    <p>This is the content of Box 1.</p>
-                </div>
+            <div class="container">
+                    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+                        <a class="navbar-brand" href="#">
+                <img src="../static/images/companylogo.jpg" width="30" height="30" class="d-inline-block align-top" alt="Company Logo">
+                Company Name
+            </a>
+            <span class="navbar-text mx-auto">
+                Face Recognised attendence system
+            </span>
+            <div class="d-flex", style="margin-right:20px ">
+                <span class="navbar-text mr-2" style="margin-right:5px">
+                    Date: 26/10/2023, Wednesday
+                </span>
+                <span class="navbar-text">
+                Time: 09:09 AM
+                </span>
+
             </div>
-            <!-- Second Box: 2nd Column, 1st Row -->
-            <div class="col-md-6">
-                <div class="box box-2">
-                    <h2>Box 2</h2>
-                    <p>This is the content of Box 2.</p>
-                </div>
-            </div>
+            <button class="btn my-2 my-sm-0" style="margin-right:20px">Admin Login</button>
+
+                    </header>
+              </div>
         </div>
+<!--below row is the body of the website-->
         <div class="row">
-            <!-- Third Box: 2nd Column, 2nd Row -->
-            <div class="col-md-6 offset-md-6">
-                <div class="box box-3">
-                    <h2>Box 3</h2>
-                    <p>This is the content of Box 3.</p>
+            <div class="col">
+                  <h1>Attendence Log box</h1>
+                </div>
+            <div class="col">
+                <div class="row">
+                    <h1>New User Registration box</h1>
+                </div>
+                <div class="row">
+                   <h1>Total Users lists</h1>
                 </div>
             </div>
         </div>
     </div>
-</main>
 
 </body>
 </html>
