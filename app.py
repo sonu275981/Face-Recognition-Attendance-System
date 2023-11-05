@@ -106,7 +106,7 @@ def add_attendance(name):
 @app.route('/')
 def home():
     names,rolls,times,l = extract_attendance()
-    return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2, mess = MESSAGE)
+    return render_template('home.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2, mess = MESSAGE)
 
 
 #### This function will run when we click on Take Attendance Button
@@ -117,7 +117,7 @@ def start():
         names, rolls, times, l = extract_attendance()
         MESSAGE = 'This face is not registered with us , kindly register yourself first'
         print("face not in database, need to register")
-        return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg,datetoday2=datetoday2, mess = MESSAGE)
+        return render_template('home.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg,datetoday2=datetoday2, mess = MESSAGE)
         # return render_template('home.html',totalreg=totalreg(),datetoday2=datetoday2,mess='There is no trained model in the static folder. Please add a new face to continue.')
 
     cap = cv2.VideoCapture(0)
@@ -161,7 +161,7 @@ def start():
     names, rolls, times, l = extract_attendance()
     MESSAGE = 'Attendence taken successfully'
     print("attendence registered")
-    return render_template('index.html', names=names, rolls=rolls, times=times, l=l, totalreg=totalreg(),
+    return render_template('home.html', names=names, rolls=rolls, times=times, l=l, totalreg=totalreg(),
                            datetoday2=datetoday2, mess=MESSAGE)
 
 @app.route('/add',methods=['GET','POST'])
@@ -198,10 +198,10 @@ def add():
         names, rolls, times, l = extract_attendance()
         MESSAGE = 'User added Sucessfully'
         print("message changed")
-        return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2, mess = MESSAGE)
+        return render_template('home.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2, mess = MESSAGE)
     else:
-        return redirect(url_for('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2))
-    # return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2)
+        return redirect(url_for('home.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2))
+    # return render_template('home.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2)
 
 #### Our main function which runs the Flask App
 app.run(debug=True,port=1000)
