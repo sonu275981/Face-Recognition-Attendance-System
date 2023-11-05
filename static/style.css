@@ -54,3 +54,43 @@
     display: table;
 }
 
+
+    #Abutton{
+        font-size: 24px;
+        font-weight: bold;
+        border-radius: 10px;
+        width:250px;
+        padding: 10px;
+        margin-top: 30px;
+        margin-bottom: 30px;
+        color: #17139e;
+        box-shadow: 15px 15px 19px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease 0s;
+        outline: none;
+    }
+    #Abutton:hover{
+        color: white;
+        background-color: #17139e;
+        box-shadow: 0px 15px 20px #6864d7;
+        transform: translateY(-7px);
+    }
+
+    #add{
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 10px;
+        width:200px;
+        padding: 10px;
+        margin-top: 15px;
+        margin-bottom: 1px;
+        color: #17139e;
+        box-shadow: 15px 15px 19px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease 0s;
+        outline: none;
+    }
+    #add:hover{
+        color: white;
+        background-color: #17139e;
+        box-shadow: 0px 15px 20px #6864d7;
+        transform: translateY(-7px);
+    }
