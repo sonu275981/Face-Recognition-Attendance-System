@@ -30,7 +30,7 @@ Software for Industry , where they can track the attendence of their employee wi
 -	Capturing Live Images
 
 -	To understand the Total number of Users in Database
--	
+  
 -	Click on Take Attendance 
 
 -	Multiple User Faces can be detected
