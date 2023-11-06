@@ -46,8 +46,8 @@ Software for Industry , where they can track the attendence of their employee wi
 - this is useful in tracking the attendence of your employees
 
 ## Contributing
-- Explain how others can contribute to the project.
-
+- Contributers are welcomed, you can simply fork the repo and contribute , and make PR
+- Dont wait for getting issue assigned to you
 ## License
 - Include information about the project's license.
 
